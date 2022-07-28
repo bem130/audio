@@ -25,13 +25,15 @@ function sound(freq) {
 }
 
 sounds = [
-    [440,4],
-    [493,4],
-    [440,4],
-    [450,4],
-    [400,4],
+    [443,4],
+    [401,3],
+    [434,1],
+    [477,4],
+    [452,4],
+    [582,1],
+    [502,1],
 ]
-beat = 300
+beat = 100
 
 var pcnt = 0;
 function play(snds) {
@@ -43,11 +45,13 @@ function play_o(snds) {
     sound(snds[pcnt][0]);
     if (pcnt<sounds.length-1) {
         setTimeout(play_o,beat*snds[pcnt][1],snds)
+        pcnt++;
     }
     else {
+        pcnt=0;
         setTimeout(sound,beat*snds[pcnt][1],0)
+        setTimeout(play_o,beat*snds[pcnt][1],snds)
     }
-    pcnt++;
 }
 
 </script>
