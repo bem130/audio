@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>sound</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+
+    </body>
+</html>
+<script>
+const ACtx = new (window.AudioContext || window.webkitAudioContext)();
+
+var oscillator = ACtx.createOscillator();
+window.onload = setup
+function setup() {
+    oscillator.type = 'sin';
+    sound(0);
+    oscillator.start();
+}
+
+function sound(freq) {
+    oscillator.frequency.value = freq; // value in hertz
+    oscillator.connect(ACtx.destination);
+}
+
+sounds = [
+    [440,4],
+    [493,4],
+    [440,4],
+    [450,4],
+    [400,4],
+]
+beat = 300
+
+var pcnt = 0;
+function play(snds) {
+    pcnt = 0;
+    play_o(snds)
+    console.log(snds)
+}
+function play_o(snds) {
+    sound(snds[pcnt][0]);
+    if (pcnt<sounds.length-1) {
+        setTimeout(play_o,beat*snds[pcnt][1],snds)
+    }
+    else {
+        setTimeout(sound,beat*snds[pcnt][1],0)
+    }
+    pcnt++;
+}
+
+</script>
+<style>
+
+</style>
