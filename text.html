@@ -199,6 +199,24 @@ function mkscore(score) {
                     iarr[index+3] = 255; // Alpha
                 }
             }
+            if (score[ncnt]<8) {
+                for (let iy=0;iy<35;iy++) {
+                    let index = ((iy+linc*100+200-5*(score[ncnt]))*x+(left+11))*4; // index of position [ix,iy]
+                    iarr[index+0] = 0; // Red
+                    iarr[index+1] = 0; // Green
+                    iarr[index+2] = 0; // Blue
+                    iarr[index+3] = 255; // Alpha
+                }
+            }
+            else {
+                for (let iy=0;iy<35;iy++) {
+                    let index = ((iy+linc*100+235-5*(score[ncnt]))*x+(left))*4; // index of position [ix,iy]
+                    iarr[index+0] = 0; // Red
+                    iarr[index+1] = 0; // Green
+                    iarr[index+2] = 0; // Blue
+                    iarr[index+3] = 255; // Alpha
+                }
+            }
         }
         left += 50
         if (left>x-100) {
@@ -229,6 +247,7 @@ let notes = {
         [0,0,0,0,0,0,0,0,0,0,0],
     ]
 }
+playtext(document.getElementById('text').value)
 
 </script>
 
