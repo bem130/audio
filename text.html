@@ -15,7 +15,7 @@
         <p>16進数に、ラ(220Hz)から、白鍵の音を順に割り振り、それを流す</p>
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
         <textarea id="text" class="bigarea">enter text here and click the button on the bottom</textarea>
-        <p>speed: <input type="range" id="speed" min="10" max="500" value="150" step="10"></p><br>
+        <p>speed: <input type="range" id="speed" min="10" max="250" value="75" step="10"></p><br>
         <button onclick="playtext(document.getElementById('text').value)">play</button>
         <img id="score">
     </body>
@@ -51,7 +51,7 @@ function utf8_to_text(data) {
 }
 function playtext(text) {
     beat = Number(document.getElementById("speed").value)
-    delay = beat/2*0
+    delay = beat*0.25 // 休符
     let tmpdatas = text_to_utf8(text);
     let datas = [];
     for (let i=0;i<tmpdatas.length;i++) {
@@ -112,21 +112,22 @@ function play_o(snds) {
         playi = false;
     }
     else {
+        let sndl = beat*2
         sound(snds[pcnt]);
         if (pcnt<snds.length-1) {
             pcnt++;
             if (pcnt%2==0) {
-                setTimeout(sound,beat,0)
-                setTimeout(play_o,beat+delay,snds)
+                setTimeout(sound,sndl,0)
+                setTimeout(play_o,sndl+delay,snds)
             }
             else {
-                setTimeout(play_o,beat,snds)
+                setTimeout(play_o,sndl,snds)
             }
         }
         else {
             pcnt=0;
-            setTimeout(end,beat)
-            setTimeout(end,beat+11)
+            setTimeout(end,sndl)
+            setTimeout(end,sndl+11)
             playi = false;
         }
     }
@@ -140,48 +141,46 @@ function play_o(snds) {
 let sign = new Image()
 sign.crossOrigin = 'anonymous';
 sign.src = "./sign.png";
-function mkline(x,l,topm) {
+function mkline(x,l,linh,topm) {
     for (let linc=0;linc<l;linc++) {
-        for (let iy = 0; iy < 100; iy++) {
+        for (let iy = 0; iy < linh; iy++) {
             if (!((iy+6)%10||iy>65||iy<15)) {
                 for (let ix = 50; ix < x-50; ix++) {
-                    let index = ((iy+topm+linc*100)*x+ix)*4; // index of position [ix,iy]
+                    let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
                     iarr[index+0] = 0; // Red
                     iarr[index+1] = 0; // Green
                     iarr[index+2] = 0; // Blue
-                    iarr[index+3] = 255; // Alpha
                 }
             }
         }
         for (let iy=25;iy<65;iy++) {
             {
                 let ix = 50
-                let index = ((iy+topm+linc*100)*x+ix)*4; // index of position [ix,iy]
+                let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
                 iarr[index+0] = 0; // Red
                 iarr[index+1] = 0; // Green
                 iarr[index+2] = 0; // Blue
-                iarr[index+3] = 255; // Alpha
             }
             {
                 let ix = 950
-                let index = ((iy+topm+linc*100)*x+ix)*4; // index of position [ix,iy]
+                let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
                 iarr[index+0] = 0; // Red
                 iarr[index+1] = 0; // Green
                 iarr[index+2] = 0; // Blue
-                iarr[index+3] = 255; // Alpha
             }
         }
     }
 }
 function mkscore(score) {
     x = 1000
-    line = 12
+    line = 8
     topm = 150
     bottomm = 100
-    y = (line+1)*100+bottomm
+    linh = 120
+    y = (line+1)*linh+bottomm
     iarr = new Uint8ClampedArray(x*y*4).fill(255);
     let co = document.createElement("canvas");
-    mkline(x,line,topm,iarr)
+    mkline(x,line,linh,topm,iarr)
     ctx = co.getContext('2d')
     co.height=y;co.width=x;
     console.log(score)
@@ -191,34 +190,72 @@ function mkscore(score) {
         nimg = notes["quarternote"]
         for (let iy = 0; iy < nimg.length; iy++) {
             for (let ix = 0; ix < nimg[0].length; ix++) {
-                let index = ((iy+linc*100+topm+3-5*(score[ncnt]-15))*x+(ix+left))*4; // index of position [ix,iy]
+                let index = ((iy+linc*linh+topm+3-5*(score[ncnt]-15))*x+(ix+left))*4; // index of position [ix,iy]
                 if (nimg[iy][ix]==1) {
                     iarr[index+0] = 0; // Red
                     iarr[index+1] = 0; // Green
                     iarr[index+2] = 0; // Blue
-                    iarr[index+3] = 255; // Alpha
                 }
             }
             if (score[ncnt]<8) {
                 for (let iy=0;iy<35;iy++) {
-                    let index = ((iy+linc*100+200-5*(score[ncnt]))*x+(left+11))*4; // index of position [ix,iy]
+                    let index = ((iy+linc*linh+topm+50-5*(score[ncnt]))*x+(left+11))*4; // index of position [ix,iy]
                     iarr[index+0] = 0; // Red
                     iarr[index+1] = 0; // Green
                     iarr[index+2] = 0; // Blue
-                    iarr[index+3] = 255; // Alpha
                 }
             }
             else {
                 for (let iy=0;iy<35;iy++) {
-                    let index = ((iy+linc*100+235-5*(score[ncnt]))*x+(left))*4; // index of position [ix,iy]
+                    let index = ((iy+linc*linh+topm+85-5*(score[ncnt]))*x+(left))*4; // index of position [ix,iy]
                     iarr[index+0] = 0; // Red
                     iarr[index+1] = 0; // Green
                     iarr[index+2] = 0; // Blue
-                    iarr[index+3] = 255; // Alpha
                 }
             }
         }
-        left += 50
+        // ledger line
+        if (score[ncnt]<=2) {
+            for (let ix = -5; ix < 16; ix++) {
+                let index = ((linc*linh+topm+74)*x+(left+ix))*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+            }
+        }
+        if (score[ncnt]<=0) {
+            for (let ix = -5; ix < 16; ix++) {
+                let index = ((linc*linh+topm+84)*x+(left+ix))*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+            }
+        }
+        if (score[ncnt]>=13) {
+            for (let ix = -5; ix < 16; ix++) {
+                let index = ((linc*linh+topm+14)*x+(left+ix))*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+            }
+        }
+
+        left += 45
+    if (ncnt%2==1) {
+        nimg = notes["sixteenthnoterest"]
+        for (let iy = 0; iy < nimg.length; iy++) {
+            for (let ix = 0; ix < nimg[0].length; ix++) {
+                let index = ((iy+linc*linh+topm+36)*x+(ix+left))*4; // index of position [ix,iy]
+                if (nimg[iy][ix]==1) {
+                    iarr[index+0] = 0; // Red
+                    iarr[index+1] = 0; // Green
+                    iarr[index+2] = 0; // Blue
+                }
+            }
+        }
+        left += 40
+    }
+
         if (left>x-100) {
             left = 120;
             linc++;
@@ -226,25 +263,55 @@ function mkscore(score) {
     }
     ctx.putImageData(new ImageData(iarr,x,y),0,0);
     for (let lincn=0;lincn<line;lincn++) {
-        ctx.drawImage(sign,51,15+topm+lincn*100)
+        ctx.drawImage(sign,51,15+topm+lincn*linh)
     }
     document.getElementById("score").src = co.toDataURL('image/png');
 }
 let notes = {
     "quarternote": [
-        [0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,1,1,1,1,1,0,0,0],
-        [0,1,1,1,1,1,1,1,1,1,0],
-        [0,1,1,1,1,1,1,1,1,1,0],
-        [1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,1,1,1,1],
-        [1,1,1,1,1,1,1,1,1,1,1],
-        [0,1,1,1,1,1,1,1,1,1,0],
-        [0,1,1,1,1,1,1,1,1,1,0],
-        [0,0,0,1,1,1,1,1,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1,0,0],
+        [0,1,1,1,1,1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1,1,1,1,0,0],
+        [0,1,1,1,1,1,1,1,1,1,0,0],
+        [0,1,1,1,1,1,1,1,1,0,0,0],
+        [0,0,0,1,1,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    "sixteenthnoterest": [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,1,1,1,0,0,0,1,1,0,0],
+        [0,0,0,1,1,1,1,1,0,0,1,1,0,0],
+        [0,0,0,1,1,1,1,1,0,0,1,1,0,0],
+        [0,0,0,0,1,1,1,0,0,1,1,1,0,0],
+        [0,0,0,0,0,0,0,1,1,0,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,1,1,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,1,0,0,0,1,1,0,0,0],
+        [0,0,1,1,1,1,1,0,0,1,1,0,0,0],
+        [0,0,1,1,1,1,1,0,0,1,1,0,0,0],
+        [0,0,0,1,1,1,0,0,1,1,0,0,0,0],
+        [0,0,0,0,0,1,1,1,1,1,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ]
 }
 playtext(document.getElementById('text').value)
