@@ -262,7 +262,7 @@ function mkscore(score) {
             }
         }
         left += 35
-        if (ncnt%4==3&&left<1000-100-45*2-35-20) {
+        if (ncnt%4==3&&left<1000-100-45*2-35-20&&ncnt<score.length-1) {
             for (let iy=25;iy<65;iy++) {
                 let ix = left
                 let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
@@ -274,18 +274,24 @@ function mkscore(score) {
         }
     }
 
-        if (left>x-100) {
+        if (left>x-100&&ncnt<score.length-1) {
             left = 115;
             linc++;
         }
     }
-    left -= 24
+    left = 943
         for (let iy=25;iy<65;iy++) {
-            let ix = left
-            let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
-            iarr[index+0] = 0; // Red
-            iarr[index+1] = 0; // Green
-            iarr[index+2] = 0; // Blue
+            ix = left
+                let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+            for (ix=left+4;ix<left+7;ix++) {
+                let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+            }
         }
         left += 25
     ctx.putImageData(new ImageData(iarr,x,y),0,0);
