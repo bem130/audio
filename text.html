@@ -19,7 +19,7 @@
     </body>
 </html>
 <script>
-document.getElementById("text").value = `enter text here\nand click the button on the right`
+
 let ACtx;
 
 var oscillator;
@@ -99,6 +99,20 @@ function play_o(snds) {
         setTimeout(end,beat+11)
     }
 }
+
+</script>
+<script>
+
+document.getElementById("text").value = `enter text here\nand click the button on the right`
+
+let params = location.href.split("?")[1]
+    if (params!=null) {
+        let spram = new URLSearchParams(params)
+        pltext = spram.get("text");
+        if (text!=null) {
+            document.getElementById("text").value = pltext
+        }
+    }
 
 </script>
 <style>
