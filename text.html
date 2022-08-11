@@ -16,7 +16,7 @@
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
         <textarea id="text" class="bigarea">enter text here and click the button on the bottom</textarea>
         <p>speed: <input type="range" id="speed" min="10" max="250" value="75" step="10"></p><br>
-        <button onclick="playtext(document.getElementById('text').value)">play</button>
+        <button onclick="makesound(document.getElementById('text').value);splay(sounddata);">play</button>
         <img id="score">
     </body>
 </html>
@@ -25,6 +25,7 @@
 let ACtx;
 let playi = false;
 let setuped = false;
+var sounddata
 
 var oscillator;
 function setup() {
@@ -49,7 +50,7 @@ function text_to_utf8(text) {
 function utf8_to_text(data) {
     return (new TextDecoder("utf-8")).decode(new Uint8Array(data));
 }
-function playtext(text) {
+function makesound(text) {
     beat = Number(document.getElementById("speed").value)
     delay = beat*0.25 // 休符
     let tmpdatas = text_to_utf8(text);
@@ -71,10 +72,10 @@ function playtext(text) {
         frqdata.push(fr(220,nfreqs[datas[i]]-1));
         scorenamedata.push(nfreqsname[datas[i]])
     }
-    splay(frqdata);
     mkscore(datas);
     console.log(datas)
     console.log(scorenamedata)
+    sounddata = frqdata
 }
 function fr(b,n) { // b Hzから半音nつ上
     return b*(2**(n/12))
@@ -137,9 +138,12 @@ function play_o(snds) {
 <script>
 
 // music score
-
+function mksoundtext(){makesound(document.getElementById('text').value)}
+document.getElementById('text').onchange = mksoundtext
+document.getElementById('text').onkeydown = mksoundtext
+document.getElementById('text').onkeypress = mksoundtext
 let sign = new Image()
-sign.crossOrigin = 'anonymous';
+sign.onload = mksoundtext
 sign.src = "./sign.png";
 function mkline(x,l,linh,topm) {
     for (let linc=0;linc<l;linc++) {
@@ -173,10 +177,10 @@ function mkline(x,l,linh,topm) {
 }
 function mkscore(score) {
     x = 1000
-    line = 8
+    line = 10
     topm = 150
     bottomm = 100
-    linh = 120
+    linh = 110
     y = (line+1)*linh+bottomm
     iarr = new Uint8ClampedArray(x*y*4).fill(255);
     let co = document.createElement("canvas");
@@ -184,7 +188,7 @@ function mkscore(score) {
     ctx = co.getContext('2d')
     co.height=y;co.width=x;
     console.log(score)
-    left = 120
+    left = 110
     linc = 0
     for (let ncnt=0;ncnt<score.length;ncnt++) {
         nimg = notes["quarternote"]
@@ -240,7 +244,7 @@ function mkscore(score) {
             }
         }
 
-        left += 45
+        left += 50
     if (ncnt%2==1) {
         nimg = notes["sixteenthnoterest"]
         for (let iy = 0; iy < nimg.length; iy++) {
@@ -257,7 +261,7 @@ function mkscore(score) {
     }
 
         if (left>x-100) {
-            left = 120;
+            left = 110;
             linc++;
         }
     }
@@ -314,7 +318,7 @@ let notes = {
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ]
 }
-playtext(document.getElementById('text').value)
+
 
 </script>
 
