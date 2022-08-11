@@ -16,8 +16,9 @@
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
         <textarea id="text" class="bigarea">enter text here and click the button on the bottom</textarea>
         <p>speed: <input type="range" id="speed" min="10" max="250" value="75" step="10"></p><br>
-        <button onclick="makesound(document.getElementById('text').value);splay(sounddata);">play</button>
+        <button onclick="makesound(document.getElementById('text').value);splay(sounddata);">play</button><br>
         <img id="score">
+        <img id="back">
     </body>
 </html>
 <script>
@@ -270,6 +271,7 @@ function mkscore(score) {
         ctx.drawImage(sign,51,15+topm+lincn*linh)
     }
     document.getElementById("score").src = co.toDataURL('image/png');
+    document.getElementById("back").src = co.toDataURL('image/png');
 }
 let notes = {
     "quarternote": [
@@ -348,5 +350,13 @@ button {
     width: 70%;
     max-width: 500px;
     border: 1px solid black;
+}
+#back {
+    width: 100%;
+    position: absolute;
+    top: -200px;
+    left: 0;
+    z-index: -1;
+    opacity: 0.2;
 }
 </style>
