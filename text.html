@@ -15,7 +15,7 @@
         <p>16進数に、ラ(220Hz)から、白鍵の音を順に割り振り、それを流す</p>
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
         <textarea id="text" class="bigarea">enter text here and click the button on the bottom</textarea>
-        <p>speed: <input type="range" id="speed" min="10" max="250" value="75" step="10"></p><br>
+        <p>speed: <input type="range" id="speed" min="10" max="500" value="100" step="10"></p><br>
         <button onclick="makesound(document.getElementById('text').value);splay(sounddata);">play</button><br>
         <img id="score">
         <img id="back">
@@ -53,7 +53,7 @@ function utf8_to_text(data) {
 }
 function makesound(text) {
     beat = Number(document.getElementById("speed").value)
-    delay = beat*0.25 // 休符
+    delay = beat*0.5 // 休符
     let tmpdatas = text_to_utf8(text);
     let datas = [];
     for (let i=0;i<tmpdatas.length;i++) {
@@ -114,7 +114,7 @@ function play_o(snds) {
         playi = false;
     }
     else {
-        let sndl = beat*2
+        let sndl = beat*1
         sound(snds[pcnt]);
         if (pcnt<snds.length-1) {
             pcnt++;
@@ -146,6 +146,9 @@ document.getElementById('text').onkeypress = mksoundtext
 let sign = new Image()
 sign.onload = mksoundtext
 sign.src = "./sign.png";
+let signfst = new Image()
+signfst.onload = mksoundtext
+signfst.src = "./signfst.png";
 function mkline(x,l,linh,topm) {
     for (let linc=0;linc<l;linc++) {
         for (let iy = 0; iy < linh; iy++) {
@@ -189,7 +192,7 @@ function mkscore(score) {
     ctx = co.getContext('2d')
     co.height=y;co.width=x;
     console.log(score)
-    left = 110
+    left = 145
     linc = 0
     for (let ncnt=0;ncnt<score.length;ncnt++) {
         nimg = notes["quarternote"]
@@ -245,7 +248,7 @@ function mkscore(score) {
             }
         }
 
-        left += 50
+        left += 45
     if (ncnt%2==1) {
         nimg = notes["sixteenthnoterest"]
         for (let iy = 0; iy < nimg.length; iy++) {
@@ -258,18 +261,38 @@ function mkscore(score) {
                 }
             }
         }
-        left += 40
+        left += 35
+        if (ncnt%4==3&&left<1000-100-45*2-35-20) {
+            for (let iy=25;iy<65;iy++) {
+                let ix = left
+                let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+            }
+            left += 25
+        }
     }
 
         if (left>x-100) {
-            left = 110;
+            left = 115;
             linc++;
         }
     }
+    left -= 24
+        for (let iy=25;iy<65;iy++) {
+            let ix = left
+            let index = ((iy+topm+linc*linh)*x+ix)*4; // index of position [ix,iy]
+            iarr[index+0] = 0; // Red
+            iarr[index+1] = 0; // Green
+            iarr[index+2] = 0; // Blue
+        }
+        left += 25
     ctx.putImageData(new ImageData(iarr,x,y),0,0);
     for (let lincn=0;lincn<line;lincn++) {
         ctx.drawImage(sign,51,15+topm+lincn*linh)
     }
+    ctx.drawImage(signfst,51,15+topm)
     document.getElementById("score").src = co.toDataURL('image/png');
     document.getElementById("back").src = co.toDataURL('image/png');
 }
@@ -290,16 +313,6 @@ let notes = {
         [0,0,0,0,0,0,0,0,0,0,0,0],
     ],
     "sixteenthnoterest": [
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,1,1,1,0,0,0,1,1,0,0],
-        [0,0,0,1,1,1,1,1,0,0,1,1,0,0],
-        [0,0,0,1,1,1,1,1,0,0,1,1,0,0],
-        [0,0,0,0,1,1,1,0,0,1,1,1,0,0],
-        [0,0,0,0,0,0,0,1,1,0,1,1,0,0],
-        [0,0,0,0,0,0,0,0,0,0,1,1,0,0],
-        [0,0,0,0,0,0,0,0,0,1,1,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,1,1,0,0],
-        [0,0,0,0,0,0,0,0,0,1,1,0,0,0],
         [0,0,0,1,1,1,0,0,0,1,1,0,0,0],
         [0,0,1,1,1,1,1,0,0,1,1,0,0,0],
         [0,0,1,1,1,1,1,0,0,1,1,0,0,0],
@@ -347,8 +360,9 @@ button {
     width: 120px;
 }
 #score {
-    width: 70%;
-    max-width: 500px;
+    width: 50%;
+    max-width: 1000px;
+    min-width: 200px;
     border: 1px solid black;
 }
 #back {
