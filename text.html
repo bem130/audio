@@ -14,9 +14,10 @@
         <p>概要: テキストをutf-8でエンコードし、2桁の16進数に直す</p>
         <p>16進数に、ラ(220Hz)から、白鍵の音を順に割り振り、それを流す</p>
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
-        <textarea id="text" class="bigarea"></textarea>
+        <textarea id="text" class="bigarea">enter text here and click the button on the bottom</textarea>
         <p>speed: <input type="range" id="speed" min="10" max="500" value="150" step="10"></p><br>
         <button onclick="playtext(document.getElementById('text').value)">play</button>
+        <img id="score">
     </body>
 </html>
 <script>
@@ -50,7 +51,7 @@ function utf8_to_text(data) {
 }
 function playtext(text) {
     beat = Number(document.getElementById("speed").value)
-    delay = beat/10
+    delay = beat/2*0
     let tmpdatas = text_to_utf8(text);
     let datas = [];
     for (let i=0;i<tmpdatas.length;i++) {
@@ -65,16 +66,24 @@ function playtext(text) {
         console.log(utf8_to_text(dcdata))
     }
     let frqdata = [];
+    let scorenamedata = [];
     for (let i=0;i<datas.length;i++) {
         frqdata.push(fr(220,nfreqs[datas[i]]-1));
+        scorenamedata.push(nfreqsname[datas[i]])
     }
     splay(frqdata);
+    mkscore(datas);
+    console.log(datas)
+    console.log(scorenamedata)
 }
 function fr(b,n) { // b Hzから半音nつ上
     return b*(2**(n/12))
 }
 nfreqs = [
     1,3,4,6,8,9,11, 13,15,16,18,20,21,23, 25,27
+]
+nfreqsname = [
+    "ラ.","シ.","ド","レ","ミ","ファ","ソ","ラ","シ","ド^","レ^","ミ^","ファ^","ソ^","ラ^","シ^",
 ]
 beat = 100
 delay = 0
@@ -87,10 +96,8 @@ function play(snds) {
     playi = true;
     pcnt = 0;
     play_o(snds)
-    console.log(snds)
 }
 function splay(snds) {
-    console.log(playi)
     if (playi) {
         playi = false;
         setTimeout(play,delay+beat+500,snds)
@@ -128,7 +135,104 @@ function play_o(snds) {
 </script>
 <script>
 
-document.getElementById("text").value = `enter text here\nand click the button on the bottom`
+// music score
+
+let sign = new Image()
+sign.crossOrigin = 'anonymous';
+sign.src = "./sign.png";
+function mkline(x,l,topm) {
+    for (let linc=0;linc<l;linc++) {
+        for (let iy = 0; iy < 100; iy++) {
+            if (!((iy+6)%10||iy>65||iy<15)) {
+                for (let ix = 50; ix < x-50; ix++) {
+                    let index = ((iy+topm+linc*100)*x+ix)*4; // index of position [ix,iy]
+                    iarr[index+0] = 0; // Red
+                    iarr[index+1] = 0; // Green
+                    iarr[index+2] = 0; // Blue
+                    iarr[index+3] = 255; // Alpha
+                }
+            }
+        }
+        for (let iy=25;iy<65;iy++) {
+            {
+                let ix = 50
+                let index = ((iy+topm+linc*100)*x+ix)*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+                iarr[index+3] = 255; // Alpha
+            }
+            {
+                let ix = 950
+                let index = ((iy+topm+linc*100)*x+ix)*4; // index of position [ix,iy]
+                iarr[index+0] = 0; // Red
+                iarr[index+1] = 0; // Green
+                iarr[index+2] = 0; // Blue
+                iarr[index+3] = 255; // Alpha
+            }
+        }
+    }
+}
+function mkscore(score) {
+    x = 1000
+    line = 12
+    topm = 150
+    bottomm = 100
+    y = (line+1)*100+bottomm
+    iarr = new Uint8ClampedArray(x*y*4).fill(255);
+    let co = document.createElement("canvas");
+    mkline(x,line,topm,iarr)
+    ctx = co.getContext('2d')
+    co.height=y;co.width=x;
+    console.log(score)
+    left = 120
+    linc = 0
+    for (let ncnt=0;ncnt<score.length;ncnt++) {
+        nimg = notes["quarternote"]
+        for (let iy = 0; iy < nimg.length; iy++) {
+            for (let ix = 0; ix < nimg[0].length; ix++) {
+                let index = ((iy+linc*100+topm+3-5*(score[ncnt]-15))*x+(ix+left))*4; // index of position [ix,iy]
+                if (nimg[iy][ix]==1) {
+                    iarr[index+0] = 0; // Red
+                    iarr[index+1] = 0; // Green
+                    iarr[index+2] = 0; // Blue
+                    iarr[index+3] = 255; // Alpha
+                }
+            }
+        }
+        left += 50
+        if (left>x-100) {
+            left = 120;
+            linc++;
+        }
+    }
+    ctx.putImageData(new ImageData(iarr,x,y),0,0);
+    for (let lincn=0;lincn<line;lincn++) {
+        ctx.drawImage(sign,51,15+topm+lincn*100)
+    }
+    document.getElementById("score").src = co.toDataURL('image/png');
+}
+let notes = {
+    "quarternote": [
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,1,1,1,1,1,0,0,0],
+        [0,1,1,1,1,1,1,1,1,1,0],
+        [0,1,1,1,1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1,1],
+        [0,1,1,1,1,1,1,1,1,1,0],
+        [0,1,1,1,1,1,1,1,1,1,0],
+        [0,0,0,1,1,1,1,1,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+    ]
+}
+
+</script>
+
+<script>
 
 let params = location.href.split("?")[1]
     if (params!=null) {
@@ -149,5 +253,9 @@ let params = location.href.split("?")[1]
 button {
     height: 30px;
     width: 120px;
+}
+#score {
+    width: 70%;
+    border: 1px solid black;
 }
 </style>
