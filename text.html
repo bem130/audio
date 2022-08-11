@@ -61,7 +61,7 @@ function playtext(text) {
     }
     let frqdata = [];
     for (let i=0;i<datas.length;i++) {
-        frqdata.push(fr(440,nfreqs[datas[i]]));
+        frqdata.push(fr(220,nfreqs[datas[i]]));
     }
     play(frqdata);
 }
