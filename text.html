@@ -15,7 +15,7 @@
         <p>16進数に、ラ(440Hz)から、白鍵の音を順に割り振り、それを流す</p>
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
         <textarea id="text" class="bigarea"></textarea>
-        <p>speed: <input type="range" id="speed" min="1" max="1000" value="150" step="10"></p><br>
+        <p>speed: <input type="range" id="speed" min="10" max="500" value="150" step="10"></p><br>
         <button onclick="playtext(document.getElementById('text').value)">play</button>
     </body>
 </html>
@@ -50,7 +50,7 @@ function utf8_to_text(data) {
 }
 function playtext(text) {
     beat = Number(document.getElementById("speed").value)
-    delay = beat/2
+    delay = beat/10
     let tmpdatas = text_to_utf8(text);
     let datas = [];
     for (let i=0;i<tmpdatas.length;i++) {
