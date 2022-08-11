@@ -15,6 +15,7 @@
         <p>16進数に、ラ(220Hz)から、白鍵の音を順に割り振り、それを流す</p>
         <p>// 音を2つ流すごとに、短い無音を挟んでいます</p>
         <textarea id="text" class="bigarea">enter text here and click the button on the bottom</textarea>
+        <textarea id="bintext" class="bigarea2" readonly></textarea>
         <p>speed: <input type="range" id="speed" min="10" max="500" value="100" step="10"></p><br>
         <button onclick="makesound(document.getElementById('text').value);splay(sounddata);">play</button><br>
         <img id="score">
@@ -59,6 +60,15 @@ function makesound(text) {
     for (let i=0;i<tmpdatas.length;i++) {
         datas.push(Math.floor((tmpdatas[i]-tmpdatas[i]%0x10)/0x10));
         datas.push(tmpdatas[i]%0x10);
+    }
+    {
+        let bintxtarr = datas.map(e=>e.toString(16))
+        let bintxt = ""
+        for (let i=0;i<bintxtarr.length;i+=2) {
+            bintxt += bintxtarr[i]+bintxtarr[i+1]+" "
+        }
+        console.log(bintxt)
+        document.getElementById("bintext").value = bintxt
     }
     {
         let dcdata = []
@@ -141,8 +151,8 @@ function play_o(snds) {
 // music score
 function mksoundtext(){makesound(document.getElementById('text').value)}
 document.getElementById('text').onchange = mksoundtext
-document.getElementById('text').onkeydown = mksoundtext
 document.getElementById('text').onkeypress = mksoundtext
+document.getElementById('text').onkeyup = mksoundtext
 let sign = new Image()
 sign.onload = mksoundtext
 sign.src = "./sign.png";
@@ -360,6 +370,13 @@ let params = location.href.split("?")[1]
     height: 40vh;
     width: 80vw;
     font-size: 120%;
+}
+.bigarea2 {
+    height: 50px;
+    width: 80vw;
+    font-size: 120%;
+    background-color: black;
+    color: azure;
 }
 button {
     height: 30px;
