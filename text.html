@@ -21,6 +21,8 @@
 <script>
 
 let ACtx;
+let playi = false;
+let setuped = false;
 
 var oscillator;
 function setup() {
@@ -36,7 +38,7 @@ function sound(freq) {
     oscillator.connect(ACtx.destination);
 }
 function end() {
-    oscillator.stop()
+    sound(0);
 }
 
 function text_to_utf8(text) {
@@ -63,7 +65,7 @@ function playtext(text) {
     for (let i=0;i<datas.length;i++) {
         frqdata.push(fr(220,nfreqs[datas[i]]));
     }
-    play(frqdata);
+    splay(frqdata);
 }
 function fr(b,n) { // b Hzから半音nつ上
     return b*(2**(n/12))
@@ -71,32 +73,52 @@ function fr(b,n) { // b Hzから半音nつ上
 nfreqs = [
     0,2,3,5,7,8,10, 12,14,15,17,20,22, 24,26,27,29,31,32,34, 36
 ]
-beat = 90
-delay = 10
+beat = 150
+delay = beat/2
 
 var pcnt = 0;
 function play(snds) {
-    setup()
+    if (!setuped) {
+        setup()
+    }
+    playi = true;
     pcnt = 0;
     play_o(snds)
     console.log(snds)
 }
-function play_o(snds) {
-    sound(snds[pcnt]);
-    if (pcnt<snds.length-1) {
-        if (pcnt%2==0) {
-            setTimeout(play_o,beat,snds)
-        }
-        else {
-            setTimeout(sound,delay,0)
-            setTimeout(play_o,beat+delay,snds)
-        }
-        pcnt++;
+function splay(snds) {
+    console.log(playi)
+    if (playi) {
+        playi = false;
+        setTimeout(play,delay+beat+500,snds)
     }
     else {
-        pcnt=0;
-        setTimeout(end,beat)
-        setTimeout(end,beat+11)
+        setTimeout(play,0,snds)
+    }
+}
+function play_o(snds) {
+    if (!playi) {
+        end();
+        playi = false;
+    }
+    else {
+        sound(snds[pcnt]);
+        if (pcnt<snds.length-1) {
+            pcnt++;
+            if (pcnt%2==0) {
+                setTimeout(sound,beat,0)
+                setTimeout(play_o,beat+delay,snds)
+            }
+            else {
+                setTimeout(play_o,beat,snds)
+            }
+        }
+        else {
+            pcnt=0;
+            setTimeout(end,beat)
+            setTimeout(end,beat+11)
+            playi = false;
+        }
     }
 }
 
